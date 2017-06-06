@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="MyPushNotificationModelStoreContainer" CdmEntityContainer="MyPushNotificationEntities">
+    <EntitySetMapping Name="TbNotificacoes">
+      <EntityTypeMapping TypeName="MyPushNotificationModel.TbNotificaco">
+        <MappingFragment StoreEntitySet="TbNotificacoes">
+          <ScalarProperty Name="dsIcone" ColumnName="dsIcone" />
+          <ScalarProperty Name="cdStatus" ColumnName="cdStatus" />
+          <ScalarProperty Name="dtCriacao" ColumnName="dtCriacao" />
+          <ScalarProperty Name="cdUsuarioCriacaoNotificacao" ColumnName="cdUsuarioCriacaoNotificacao" />
+          <ScalarProperty Name="dsNotificacao" ColumnName="dsNotificacao" />
+          <ScalarProperty Name="cdNotificacao" ColumnName="cdNotificacao" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TbNotificacoesUsuarios">
+      <EntityTypeMapping TypeName="MyPushNotificationModel.TbNotificacoesUsuario">
+        <MappingFragment StoreEntitySet="TbNotificacoesUsuarios">
+          <ScalarProperty Name="dsURL" ColumnName="dsURL" />
+          <ScalarProperty Name="stOcultarNotificacao" ColumnName="stOcultarNotificacao" />
+          <ScalarProperty Name="cdStatus" ColumnName="cdStatus" />
+          <ScalarProperty Name="dtLeitura" ColumnName="dtLeitura" />
+          <ScalarProperty Name="cdUsuario" ColumnName="cdUsuario" />
+          <ScalarProperty Name="cdNotificacao" ColumnName="cdNotificacao" />
+          <ScalarProperty Name="cdNotificacaoUsuario" ColumnName="cdNotificacaoUsuario" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

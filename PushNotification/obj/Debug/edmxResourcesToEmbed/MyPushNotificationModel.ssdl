@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="MyPushNotificationModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="TbNotificacoes">
+    <Key>
+      <PropertyRef Name="cdNotificacao" />
+    </Key>
+    <Property Name="cdNotificacao" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="dsNotificacao" Type="varchar(max)" Nullable="false" />
+    <Property Name="cdUsuarioCriacaoNotificacao" Type="int" />
+    <Property Name="dtCriacao" Type="datetime" />
+    <Property Name="cdStatus" Type="int" />
+    <Property Name="dsIcone" Type="varchar(max)" />
+  </EntityType>
+  <EntityType Name="TbNotificacoesUsuarios">
+    <Key>
+      <PropertyRef Name="cdNotificacaoUsuario" />
+    </Key>
+    <Property Name="cdNotificacaoUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="cdNotificacao" Type="int" />
+    <Property Name="cdUsuario" Type="int" />
+    <Property Name="dtLeitura" Type="datetime" />
+    <Property Name="cdStatus" Type="int" />
+    <Property Name="stOcultarNotificacao" Type="bit" />
+    <Property Name="dsURL" Type="varchar(max)" />
+  </EntityType>
+  <Association Name="fk_cdNotificacao">
+    <End Role="TbNotificacoes" Type="Self.TbNotificacoes" Multiplicity="0..1" />
+    <End Role="TbNotificacoesUsuarios" Type="Self.TbNotificacoesUsuarios" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TbNotificacoes">
+        <PropertyRef Name="cdNotificacao" />
+      </Principal>
+      <Dependent Role="TbNotificacoesUsuarios">
+        <PropertyRef Name="cdNotificacao" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="MyPushNotificationModelStoreContainer">
+    <EntitySet Name="TbNotificacoes" EntityType="Self.TbNotificacoes" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TbNotificacoesUsuarios" EntityType="Self.TbNotificacoesUsuarios" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="fk_cdNotificacao" Association="Self.fk_cdNotificacao">
+      <End Role="TbNotificacoes" EntitySet="TbNotificacoes" />
+      <End Role="TbNotificacoesUsuarios" EntitySet="TbNotificacoesUsuarios" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

@@ -1,0 +1,51 @@
+﻿@model IEnumerable<PushNotification.TbNotificaco>
+
+@{
+    ViewBag.Title = "Listar";
+}
+
+<h2>Listar</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.dsNotificacao)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.cdUsuarioCriacaoNotificacao)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.dtCriacao)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.cdStatus)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.dsNotificacao)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.cdUsuarioCriacaoNotificacao)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.dtCriacao)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.cdStatus)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.cdNotificacao }) |
+            @Html.ActionLink("Details", "Details", new { id=item.cdNotificacao }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.cdNotificacao })
+        </td>
+    </tr>
+}
+
+</table>

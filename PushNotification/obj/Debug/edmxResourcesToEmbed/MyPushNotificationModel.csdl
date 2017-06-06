@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="MyPushNotificationModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="MyPushNotificationEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="TbNotificacoes" EntityType="MyPushNotificationModel.TbNotificaco" />
+    <EntitySet Name="TbNotificacoesUsuarios" EntityType="MyPushNotificationModel.TbNotificacoesUsuario" />
+    <AssociationSet Name="fk_cdNotificacao" Association="MyPushNotificationModel.fk_cdNotificacao">
+      <End Role="TbNotificaco" EntitySet="TbNotificacoes" />
+      <End Role="TbNotificacoesUsuario" EntitySet="TbNotificacoesUsuarios" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="TbNotificaco">
+    <Key>
+      <PropertyRef Name="cdNotificacao" />
+    </Key>
+    <Property Name="cdNotificacao" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="dsNotificacao" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="cdUsuarioCriacaoNotificacao" Type="Int32" />
+    <Property Name="dtCriacao" Type="DateTime" Precision="3" />
+    <Property Name="cdStatus" Type="Int32" />
+    <NavigationProperty Name="TbNotificacoesUsuarios" Relationship="MyPushNotificationModel.fk_cdNotificacao" FromRole="TbNotificaco" ToRole="TbNotificacoesUsuario" />
+    <Property Name="dsIcone" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="TbNotificacoesUsuario">
+    <Key>
+      <PropertyRef Name="cdNotificacaoUsuario" />
+    </Key>
+    <Property Name="cdNotificacaoUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="cdNotificacao" Type="Int32" />
+    <Property Name="cdUsuario" Type="Int32" />
+    <Property Name="dtLeitura" Type="DateTime" Precision="3" />
+    <Property Name="cdStatus" Type="Int32" />
+    <NavigationProperty Name="TbNotificaco" Relationship="MyPushNotificationModel.fk_cdNotificacao" FromRole="TbNotificacoesUsuario" ToRole="TbNotificaco" />
+    <Property Name="stOcultarNotificacao" Type="Boolean" />
+    <Property Name="dsURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <Association Name="fk_cdNotificacao">
+    <End Type="MyPushNotificationModel.TbNotificaco" Role="TbNotificaco" Multiplicity="0..1" />
+    <End Type="MyPushNotificationModel.TbNotificacoesUsuario" Role="TbNotificacoesUsuario" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TbNotificaco">
+        <PropertyRef Name="cdNotificacao" />
+      </Principal>
+      <Dependent Role="TbNotificacoesUsuario">
+        <PropertyRef Name="cdNotificacao" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

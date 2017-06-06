@@ -1,0 +1,649 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+
+                <span class="noti noti-initial glyphicon glyphicon-bell"><span class="count noti-initial">&nbsp;</span></span>
+                <div class="noti-content">
+                    <div class="noti-top-arrow"></div>
+                    <ul id="notiTop">
+                        <li>
+                            <div class="row">
+                                
+                                <div class="col-sm-6"><b>Notificações</b></div>
+                                <div class="col-sm-6 text-right">
+                                    <span style="cursor:pointer" onclick="javascript:MarkAllAsRead('1234');" class="glyphicon glyphicon-ok noti-marcar-lido"></span> <!--span class="glyphicon glyphicon-cog noti-config"></span-->
+                                </div>
+                                
+                            </div>
+</ul>
+                    <ul id="notiContent" class="ul-scroll"></ul>
+                </div>
+
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Sistema de Notificações", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year -  ASP.NET Application</p>
+        </footer>
+    </div>
+    <script src="~/scripts/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="~/scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Notificacoes.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+        $(function () {
+            
+            var idioma = 1;
+            var pages = 1;
+            var quantidadeTotalRegistros;
+            var guardaQuantidadeTotalRegistros;
+            var isLoading = false;
+
+            // Click on notification icon for show notification
+            $('span.noti').on("click", function (e) {
+                e.stopPropagation();
+                $('span.noti').toggleClass("noti-click");
+                
+                $('.noti-content').show();
+
+                var count = 0;
+                count = parseInt($('span.count').html()) || 0;
+
+                //reseta as variaveis
+                $('#notiContent').empty();
+                
+                pages = 1;
+
+                //only load notification if not already loaded
+                listNotification(pages);
+                if (count > 0) {
+                    $('span.count', this).html(count);
+                } else {
+                    $('.count').removeClass("noti-bagde");
+                    $('span.count', this).html('&nbsp;');
+                }
+                
+            })
+            // hide notifications
+
+            var div = $(".noti-content");
+            $("html").on("click", function (e) {
+                if (div.has(e.target).length || e.target == div[0])
+                    return;
+
+                $('.noti-content').hide();
+                $('span.noti').removeClass("noti-click");
+            });
+
+            // update notification count
+            function updateNotificationCount(total) {
+                if (total > 0) {
+                    $('.count').addClass("noti-bagde");
+                    $('span.count').html(total);
+                } else {
+                    $('span.count').html('&nbsp;');
+                }
+                    
+
+            }
+
+            var notifications = $.connection.notificationHub;
+            // Create a function that the hub can call to broadcast messages.
+            
+            notifications.client.recieveNotification = function (data) {
+                console.log("recieveNotification", data);
+
+                if (data == 0) {
+                    $('#notiContent').append($('<li>Nenhum dado disponível</li>'));
+                    return false;
+                }
+
+                /*
+                var naolidas = 0;
+                var i;
+                for (i = 0; i < data.length; i++) {
+                    if (data[i].stNaoLido) {
+                        naolidas++;
+                    }
+                }
+                */
+                updateNotificationCount(data);
+
+              
+            };
+            
+            // signalr js code for start hub and send receive notification
+            $.connection.hub.start().done(function () {
+                console.log('Start, connection id = ' + $.connection.hub.id);
+                notifications.server.sendNotifications('1234');
+
+
+            }).fail(function (e) {
+                alert(e);
+            });
+
+            //signalr method for push server message to client
+            notifications.client.notify = function (message) {
+                console.log("message", message);
+                
+                if (message == "added") {
+                    dataLength = 0;
+                                        
+                    $.ajax({
+                        type: 'GET',
+                        url: 'NotificacoesUsuarios/addLast/1234/',
+                        success: function (response) {
+                            //console.log("success", response);
+                            $.each(response, function (index, value) {
+
+                                if ($("#notiContent").find('.notifica' + value.cdNotificacaoUsuario).html() == undefined) {
+
+
+                                    var novanot = "";
+                                    var action = "void(0);"
+                                    if (value.dtLeitura == null) {
+                                        novanot = "novaNotificacao";
+                                        action = "MarkAsRead(\'" + value.cdNotificacaoUsuario + "\');";
+                                    }
+
+
+                                    $('#notiContent').prepend($('<li class="notificacao notifica' + value.cdNotificacaoUsuario + ' ' + novanot + '" onclick="javascript:'+action+'"> ' +
+                                                           '<div class="row" style="margin:1px"> ' +
+
+                                                           '<div class="col-sm-1" style="padding-left:10px"> ' +
+                                                                '<span class="' + value.dsIcone + ' ico-notificacao"></span> ' +
+                                                            '</div>' +
+
+                                                            '<div class="col-sm-10"> ' +
+                                                                '<div class="row"> ' +
+                                                                    '<div class="col-sm-12"> ' + value.dsNotificacao + '</div>' +
+                                                                    '<div class="col-sm-12 col-data"> ' +
+                                                                        '<span class="glyphicon glyphicon-calendar"></span><span class="data"> ' + retonaHoraConvertidaEpoch(value.dtCriacao) + '</span>' +
+                                                                    '</div>' +
+                                                                '</div>' +
+                                                            '</div>' +
+
+
+                                                            '<div class="col-sm-1" style="padding-left:10px;"> ' +
+
+                                                                '<span style="cursor:pointer" onclick="javascript:ocultarNotificacao(' + value.cdNotificacaoUsuario + ');" class="glyphicon glyphicon-remove noti-visualiza-nao"></span> ' +
+
+                                                            '</div>' +
+                                                           '</div> ' +
+                                                           '</li>'));
+                                }
+
+
+                            });
+
+
+
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    })
+                
+                }
+                
+            }
+
+            
+            $("#notiContent").on("scroll", function () {
+                if (!isLoading && ($(this).scrollTop() + $(this).height() == $(this).get(0).scrollHeight)) {
+
+                    isLoading = false;
+                    listNotification(pages);
+                                        
+                }
+            });
+           
+            function timeDifference(current, previous, time, fulldate) {
+
+                var msPerMinute = 60 * 1000;
+                var msPerHour = msPerMinute * 60;
+                var msPerDay = msPerHour * 24;
+                var msPerMonth = msPerDay * 30;
+                var msPerYear = msPerDay * 365;
+                var retornoData = "";
+
+                var elapsed = current - previous;
+
+                if (elapsed < msPerMinute) {
+
+                    switch (idioma) {
+                        case 2:
+                            retornoData = "a few seconds ago";
+                            break;
+                        case 3:
+                            retornoData = "hace unos segundos";
+                            break;
+                        default:
+                            retornoData = "alguns segundos atr&aacute;s";
+                            break;
+                    }
+
+                    return retornoData;
+                    //'H&aacute; ' + Math.round(elapsed / 1000) + ' segundos ';
+                }
+
+                else if (elapsed < msPerHour) {
+                    if (Math.round(elapsed / msPerMinute) == 60)
+                    {
+                        switch (idioma) {
+                            case 2:
+                                retornoData = "1 hour ago"
+                                break;
+                            case 3:
+                                retornoData = "Hace 1 hora"
+                                break;
+                            default:
+                                retornoData = "H&aacute; 1 hora"
+                                break;
+                        }
+                        return retornoData;
+
+                    }
+                    else if (Math.round(elapsed / msPerMinute) < 2)
+                    {
+                        switch (idioma) {
+                            case 2:
+                                retornoData = "About a minute ago"
+                                break;
+                            case 3:
+                                retornoData = "Hace um minuto aproximadamente"
+                                break;
+                            default:
+                                retornoData = "H&aacute; aproximadamente um minuto"
+                                break;
+                        }
+                        return retornoData;
+
+                    }
+                    else
+                    {
+                        switch (idioma) {
+                            case 2:
+                                retornoData = Math.round(elapsed / msPerMinute) + ' minutes ago ';
+                                break;
+                            case 3:
+                                retornoData = 'Hace ' + Math.round(elapsed / msPerMinute) + ' minutos ';
+                                break;
+                            default:
+                                retornoData = 'H&aacute; ' + Math.round(elapsed / msPerMinute) + ' minutos ';
+                                break;
+                        }
+
+                        return retornoData;
+
+                    }
+                }
+
+                else if (elapsed < msPerDay) {
+
+                    if (Math.round(elapsed / msPerHour) == 24)
+                    {
+
+                        switch (idioma) {
+                            case 2:
+                                retornoData = 'Yesterday at ' + time;
+                                break;
+                            case 3:
+                                retornoData = 'Ayer ' + time;
+                                break;
+                            default:
+                                retornoData = 'Ontem &agrave;s ' + time;
+                                break;
+                        }
+                        return retornoData;
+
+                    }
+                    else
+                    {
+
+                        switch (idioma) {
+                            case 2:
+                                retornoData = Math.round(elapsed / msPerHour) + ' hours ago';
+                                break;
+                            case 3:
+                                retornoData = 'Hace ' + Math.round(elapsed / msPerHour) + ' horas';
+                                break;
+                            default:
+                                retornoData = 'H&aacute; ' + Math.round(elapsed / msPerHour) + ' horas';
+                                break;
+                        }
+
+                        return retornoData;
+
+                    }
+                }
+
+                else if (elapsed < msPerMonth) {
+                    if (Math.round(elapsed / msPerDay) == 1)
+                    {
+                        switch (idioma) {
+                            case 2:
+                                retornoData = 'Yesterday at ' + time;
+                                break;
+                            case 3:
+                                retornoData = 'Ayer ' + time;
+                                break;
+                            default:
+                                retornoData = 'Ontem &agrave;s ' + time;
+                                break;
+                        }
+                        return retornoData;
+                    }
+                    else
+                    {
+                        return fulldate;
+                    }
+
+                }
+
+                else if (elapsed < msPerYear) {
+                    return fulldate;
+                    //return 'Ha ' + Math.round(elapsed / msPerMonth) + ' meses ';
+                }
+
+                else {
+                    return fulldate;
+                    //return 'Ha ' + Math.round(elapsed / msPerYear) + ' anos';
+                }
+            }
+
+            function retonaHoraConvertidaEpoch(dateVal) {
+                // Conversão de data do tipo "/Date(1342709595000)/"
+                switch (idioma) {
+                    case 2:
+                        var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                        break;
+                    case 3:
+                        var monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+                        break;
+                    default:
+                        var monthNames = ["janeiro", "fevereiro", "mar&ccedil;o", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+                        break;
+                }
+
+                var date = new Date(parseFloat(dateVal.substr(6)));
+
+                var dataParse = new Date();
+                var current = new Date(dataParse.getFullYear(), dataParse.getMonth(), dataParse.getDate(), dataParse.getHours(), dataParse.getMinutes(), dataParse.getSeconds(), 00);
+
+                //return (date.getDate() + " de " + monthNames[(date.getMonth())] + " as " + date.getHours() + ":" + date.getMinutes());
+                var hora = (((date.getHours() < 10 ? '0' : '') + date.getHours()) + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+
+                switch (idioma) {
+                    case 2:
+
+                        var hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
+                        var am_pm = date.getHours() >= 12 ? "PM" : "AM";
+                        hours = hours < 10 ? "0" + hours : hours;
+                        var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+                        var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+                        time = hours + ":" + minutes + " " + am_pm;
+
+                        var dataCompleta = (monthNames[(date.getMonth())] + " " + date.getDate() + " at " + time);
+                        break
+                    case 3:
+                        var dataCompleta = (date.getDate() + " de " + monthNames[(date.getMonth())] + " a las " + ((date.getHours() < 10 ? '0' : '') + date.getHours()) + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+                        break;
+                    default:
+                        var dataCompleta = (date.getDate() + " de " + monthNames[(date.getMonth())] + " &agrave;s " + ((date.getHours() < 10 ? '0' : '') + date.getHours()) + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+                        break;
+                }
+
+
+                    return (timeDifference(current, new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), 00), hora, dataCompleta));
+            }
+
+            function listNotification(pagina) {
+                
+                //console.log("listNotification, pagina: ", pagina);
+                if (!isLoading) {
+
+                    $.ajax({
+                    type: 'GET',
+                    url: 'NotificacoesUsuarios/listar/1234/' + pagina,
+                    beforeSend: function() {
+                        $('#notiContent').append($('<li class="removeCarregando text-center"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></li>'));
+                    },
+                    success: function (response) {
+                        //console.log("foi", response.length);
+                        $(".removeCarregando").remove();
+
+                        if (response.length == 0) {
+                            $('#notiContent').append($('<li class="nenhumRegistroDisponivel">Nenhum registro disponível</li>'));
+
+                            if (pages != 1) {
+                                $('.nenhumRegistroDisponivel').remove();
+                            }
+
+                        } else {
+                            pages++;
+                        }
+
+                        $.each(response, function (index, value) {
+
+                            if ($("#notiContent").find('.notifica' + value.cdNotificacaoUsuario).html() == undefined) {
+
+                                var novanot = "";
+                                var action = "void(0);"
+                                if (value.dtLeitura == null) {
+                                    novanot = "novaNotificacao";
+                                    action = "MarkAsRead(\'" + value.cdNotificacaoUsuario + "\');";
+                                }
+
+
+                                $('#notiContent').append($('<li class="notificacao notifica' + value.cdNotificacaoUsuario + ' ' + novanot + '" onclick="javascript:'+action+'"> ' +
+                                                           '<div class="row" style="margin:1px"> ' +
+                                                           
+                                                           '<div class="col-sm-1" style="padding-left:10px"> ' +
+                                                                '<span class="' + value.dsIcone + ' ico-notificacao"></span> ' +
+                                                            '</div>' +
+
+                                                            '<div class="col-sm-10"> ' +
+                                                                '<div class="row"> ' +
+                                                                    '<div class="col-sm-12"> ' + value.dsNotificacao + '</div>' +
+                                                                    '<div class="col-sm-12 col-data"> ' +
+                                                                        '<span class="glyphicon glyphicon-calendar"></span><span class="data"> ' + retonaHoraConvertidaEpoch(value.dtCriacao) + '</span>' +
+                                                                    '</div>' +
+                                                                '</div>' +
+                                                            '</div>' +
+
+
+                                                            '<div class="col-sm-1" style="padding-left:10px;"> ' +
+
+                                                                '<span style="cursor:pointer" onclick="javascript:ocultarNotificacao(' + value.cdNotificacaoUsuario + ');" class="glyphicon glyphicon-remove noti-visualiza-nao"></span> ' +
+
+                                                            '</div>' +
+                                                           '</div> ' +
+                                                           '</li>'));
+
+                            }
+
+                        });
+
+
+                        
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    },
+                    always: function () {
+                        isLoading = true;
+                    }
+
+                })
+
+                }
+
+            }
+
+        })
+
+        // update notification count
+        function updateNotificationCountRead(id) {
+
+            //$('.notifica'+id).removeClass("novaNotificacao");
+            $('.notifica' + id).remove();
+
+            var count = 0;
+            count = parseInt($('span.count').html()) || 0;
+            count--;
+            if (count > 0) {
+                $('.count').addClass("noti-bagde");
+                $('span.count').html(count);
+            } else {
+                $('.count').removeClass("noti-bagde");
+                $('span.count').html('&nbsp;');
+            }
+
+            /* Execução de ajax que marca o item como lido*/
+
+            
+        }
+
+        function MarkAsRead(cd) {
+            //console.log("cd: ", cd);
+            $.ajax({
+                type: 'GET',
+                url: 'NotificacoesUsuarios/MarkAsRead/',
+                data: {
+                    id: '1234',
+                    cdNotificacaoUsuario: cd
+                },
+                success: function (response) {
+                    
+                    if (response.execucao > 0) {
+
+                        $('.notifica' + cd).removeClass("novaNotificacao");
+                        $('.notifica' + cd).attr("onclick", "javascript:void(0);");
+
+                        var count = 0;
+                        count = parseInt($('span.count').html()) || 0;
+                        count--;
+
+                        if (count > 0) {
+                            $('.count').addClass("noti-bagde");
+                            $('span.count').html(count);
+                        } else {
+                            $('.count').removeClass("noti-bagde");
+                            $('span.count').html('&nbsp;');
+                        }
+
+                    } else {
+
+                        alert("Houve uma falha na execução da ação, tente novamente");
+
+                    }
+
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+
+        function ocultarNotificacao(cd) {
+            $.ajax({
+                type: 'GET',
+                url: 'NotificacoesUsuarios/OcultarNotificacao/',
+                data: {
+                    id: '1234',
+                    cdNotificacaoUsuario: cd
+                },
+                success: function (response) {
+                    
+                    if (response.execucao > 0) {
+
+                        $('.notifica' + cd).removeClass("novaNotificacao");
+                        $(".notifica" + cd).hide('slow');
+                        
+                  
+                    }
+
+                    
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+
+            /*
+            if ($("#notiContent li").length == 0) {
+                pages = 1;
+                listNotification(pages);
+            }
+            */
+
+        }
+
+        function MarkAllAsRead(cd) {
+            $.ajax({
+                type: 'GET',
+                url: 'NotificacoesUsuarios/MarkAllAsRead/' + cd,
+                success: function (response) {
+                    
+                    if (response.execucao > 0) {
+
+                        $('.notificacao').removeClass("novaNotificacao");
+                        $('.notificacao').attr("onclick", "javascript:void(0);");
+
+                        $('.count').removeClass("noti-bagde");
+                        $('span.count').html('&nbsp;');
+
+                    } else {
+
+                        alert("Não foram encontradas notificações não lidas");
+
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+
+        $(window).on("beforeunload", function () {
+            $.connection.hub.stop();
+        });
+
+        
+
+    </script>
+    
+
+</body>
+</html>

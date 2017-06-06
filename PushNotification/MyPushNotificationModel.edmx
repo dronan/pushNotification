@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MyPushNotificationModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="TbNotificacoes">
+          <Key>
+            <PropertyRef Name="cdNotificacao" />
+          </Key>
+          <Property Name="cdNotificacao" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="dsNotificacao" Type="varchar(max)" Nullable="false" />
+          <Property Name="cdUsuarioCriacaoNotificacao" Type="int" />
+          <Property Name="dtCriacao" Type="datetime" />
+          <Property Name="cdStatus" Type="int" />
+          <Property Name="dsIcone" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="TbNotificacoesUsuarios">
+          <Key>
+            <PropertyRef Name="cdNotificacaoUsuario" />
+          </Key>
+          <Property Name="cdNotificacaoUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="cdNotificacao" Type="int" />
+          <Property Name="cdUsuario" Type="int" />
+          <Property Name="dtLeitura" Type="datetime" />
+          <Property Name="cdStatus" Type="int" />
+          <Property Name="stOcultarNotificacao" Type="bit" />
+          <Property Name="dsURL" Type="varchar(max)" />
+        </EntityType>
+        <Association Name="fk_cdNotificacao">
+          <End Role="TbNotificacoes" Type="Self.TbNotificacoes" Multiplicity="0..1" />
+          <End Role="TbNotificacoesUsuarios" Type="Self.TbNotificacoesUsuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TbNotificacoes">
+              <PropertyRef Name="cdNotificacao" />
+            </Principal>
+            <Dependent Role="TbNotificacoesUsuarios">
+              <PropertyRef Name="cdNotificacao" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MyPushNotificationModelStoreContainer">
+          <EntitySet Name="TbNotificacoes" EntityType="Self.TbNotificacoes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TbNotificacoesUsuarios" EntityType="Self.TbNotificacoesUsuarios" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="fk_cdNotificacao" Association="Self.fk_cdNotificacao">
+            <End Role="TbNotificacoes" EntitySet="TbNotificacoes" />
+            <End Role="TbNotificacoesUsuarios" EntitySet="TbNotificacoesUsuarios" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MyPushNotificationModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="MyPushNotificationEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="TbNotificacoes" EntityType="MyPushNotificationModel.TbNotificaco" />
+          <EntitySet Name="TbNotificacoesUsuarios" EntityType="MyPushNotificationModel.TbNotificacoesUsuario" />
+          <AssociationSet Name="fk_cdNotificacao" Association="MyPushNotificationModel.fk_cdNotificacao">
+            <End Role="TbNotificaco" EntitySet="TbNotificacoes" />
+            <End Role="TbNotificacoesUsuario" EntitySet="TbNotificacoesUsuarios" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="TbNotificaco">
+          <Key>
+            <PropertyRef Name="cdNotificacao" />
+          </Key>
+          <Property Name="cdNotificacao" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="dsNotificacao" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="cdUsuarioCriacaoNotificacao" Type="Int32" />
+          <Property Name="dtCriacao" Type="DateTime" Precision="3" />
+          <Property Name="cdStatus" Type="Int32" />
+          <NavigationProperty Name="TbNotificacoesUsuarios" Relationship="MyPushNotificationModel.fk_cdNotificacao" FromRole="TbNotificaco" ToRole="TbNotificacoesUsuario" />
+          <Property Name="dsIcone" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="TbNotificacoesUsuario">
+          <Key>
+            <PropertyRef Name="cdNotificacaoUsuario" />
+          </Key>
+          <Property Name="cdNotificacaoUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="cdNotificacao" Type="Int32" />
+          <Property Name="cdUsuario" Type="Int32" />
+          <Property Name="dtLeitura" Type="DateTime" Precision="3" />
+          <Property Name="cdStatus" Type="Int32" />
+          <NavigationProperty Name="TbNotificaco" Relationship="MyPushNotificationModel.fk_cdNotificacao" FromRole="TbNotificacoesUsuario" ToRole="TbNotificaco" />
+          <Property Name="stOcultarNotificacao" Type="Boolean" />
+          <Property Name="dsURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="fk_cdNotificacao">
+          <End Type="MyPushNotificationModel.TbNotificaco" Role="TbNotificaco" Multiplicity="0..1" />
+          <End Type="MyPushNotificationModel.TbNotificacoesUsuario" Role="TbNotificacoesUsuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TbNotificaco">
+              <PropertyRef Name="cdNotificacao" />
+            </Principal>
+            <Dependent Role="TbNotificacoesUsuario">
+              <PropertyRef Name="cdNotificacao" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MyPushNotificationModelStoreContainer" CdmEntityContainer="MyPushNotificationEntities">
+          <EntitySetMapping Name="TbNotificacoes">
+            <EntityTypeMapping TypeName="MyPushNotificationModel.TbNotificaco">
+              <MappingFragment StoreEntitySet="TbNotificacoes">
+                <ScalarProperty Name="dsIcone" ColumnName="dsIcone" />
+                <ScalarProperty Name="cdStatus" ColumnName="cdStatus" />
+                <ScalarProperty Name="dtCriacao" ColumnName="dtCriacao" />
+                <ScalarProperty Name="cdUsuarioCriacaoNotificacao" ColumnName="cdUsuarioCriacaoNotificacao" />
+                <ScalarProperty Name="dsNotificacao" ColumnName="dsNotificacao" />
+                <ScalarProperty Name="cdNotificacao" ColumnName="cdNotificacao" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TbNotificacoesUsuarios">
+            <EntityTypeMapping TypeName="MyPushNotificationModel.TbNotificacoesUsuario">
+              <MappingFragment StoreEntitySet="TbNotificacoesUsuarios">
+                <ScalarProperty Name="dsURL" ColumnName="dsURL" />
+                <ScalarProperty Name="stOcultarNotificacao" ColumnName="stOcultarNotificacao" />
+                <ScalarProperty Name="cdStatus" ColumnName="cdStatus" />
+                <ScalarProperty Name="dtLeitura" ColumnName="dtLeitura" />
+                <ScalarProperty Name="cdUsuario" ColumnName="cdUsuario" />
+                <ScalarProperty Name="cdNotificacao" ColumnName="cdNotificacao" />
+                <ScalarProperty Name="cdNotificacaoUsuario" ColumnName="cdNotificacaoUsuario" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
