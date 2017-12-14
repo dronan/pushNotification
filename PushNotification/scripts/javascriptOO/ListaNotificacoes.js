@@ -14,9 +14,7 @@ class ListaNotificacoes {
                 this._notificacoes.unshift(notificacao);
             } else {
                 this._notificacoes.splice(index, 1, notificacao);
-            }
-
-            
+            }          
 	    }
     }
 

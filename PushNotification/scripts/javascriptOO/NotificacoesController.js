@@ -14,16 +14,12 @@ class NotificacoesController {
         this.ajaxEof = false;
         this._totalHide = 0;
         this._cdNotificacaoUsuario = null;
-
-        this._listaNotificacoes = new ListaNotificacoes();
-
-        this.criaNotificacao();
-
-        this._notificationCount = new NotificationCountHelper();
         
+        this._notificationCount = new NotificationCountHelper();
         this._notificacaoView = new NotificacaoView(document.querySelector('#notiContent'));
-
-        this._notificacaoView.update(this._listaNotificacoes); // a view recebe o model para carregar a tabela
+        this._listaNotificacoes = new NotificationBind(new ListaNotificacoes(), this._notificacaoView, ['adiciona', 'remove']);
+        
+        this.criaNotificacao();
         
     }
 
@@ -60,7 +56,7 @@ class NotificacoesController {
 
                     });
 
-                    this._notificacaoView.update(this._listaNotificacoes);
+                    //this._notificacaoView.update(this._listaNotificacoes);
 
                     if (retornoNotificacoes.length < 10) {
                         this.ajaxEof = true;
@@ -103,7 +99,7 @@ class NotificacoesController {
 
                     });
 
-                    this._notificacaoView.update(this._listaNotificacoes);
+                    //this._notificacaoView.update(this._listaNotificacoes);
 
                     $('.animacaoIconeSinoNotificacao').animateCss('swing');
 

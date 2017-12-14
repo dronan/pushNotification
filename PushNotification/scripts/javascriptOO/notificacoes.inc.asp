@@ -7,9 +7,12 @@
 <script src="https://www.legalbox.com.br/homologacao/includes/js/ListaNotificacoes.js"></script>
 <script src="https://www.legalbox.com.br/homologacao/includes/js/NotificacaoView.js"></script>
 <script src="https://www.legalbox.com.br/homologacao/includes/js/NotificationCountHelper.js"></script>
+<script src="https://www.legalbox.com.br/homologacao/includes/js/NotificationProxyFactory.js"></script>
+<script src="https://www.legalbox.com.br/homologacao/includes/js/NotificationBind.js"></script>
 
 <input type="hidden" name="idiomaUsuario" id="idiomaUsuario" value="<%=session("cd_idioma")%>">
 <input type="hidden" name="codigoUsuario" id="codigoUsuario" value="<%=session("cd_user")%>">
+
 
 <script>
     var cd_usuario = document.querySelector("#codigoUsuario").value;
