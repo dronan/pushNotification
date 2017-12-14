@@ -129,7 +129,9 @@ class NotificacoesController {
                     $('.notifica' + this._cdNotificacaoUsuario).removeClass("novaNotificacao");
                     this._notificationCount.subtraiCount();
                     this._notificationCount.atualizaTotal();
-                    document.querySelector('.notifica'+ this._cdNotificacaoUsuario).setAttribute("onclick", document.querySelector('.notifica'+ this._cdNotificacaoUsuario).getAttribute("onclick").replace("controller.markAsRead('"+this._cdNotificacaoUsuario+"');", "void(0);"));
+
+                    let field = document.querySelector('.notifica'+ this._cdNotificacaoUsuario);
+                    field.setAttribute("onclick", field.getAttribute("onclick").replace("controller.markAsRead('"+this._cdNotificacaoUsuario+"');", "void(0);"));
                 }
             },
             error: function (error) {
